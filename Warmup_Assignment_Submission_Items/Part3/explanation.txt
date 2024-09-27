@@ -1,0 +1,3 @@
+The general conversation state that I added represents a general chatbot that can be used for regular conversation. This is useful for instances where the user has no documents to 
+give and no previous context. The custom chat node's ability is that it will be able to answer all prompts regardless of addtional user input. If the chatbot detects that the prompt is not 
+based on previous context or can't use the documents provided to answer my questions, it will classify it as a general conversation. 
