@@ -53,7 +53,7 @@ walker interact {
 
 import:py from mtllm.llms {Ollama}
 
-glob llm = Ollama(model_name='gemma2');
+glob llm = Ollama(model_name='llama3.1');
 
 
 import:jac from rag {RagEngine}
