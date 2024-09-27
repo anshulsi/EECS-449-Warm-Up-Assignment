@@ -101,7 +101,8 @@ node Session {
 
 enum ChatType {
     RAG : 'Need to use Retrievable information in specific documents to respond' = "RAG",
-    QA : 'Given context is enough for an answer' = "user_qa"
+    QA : 'Given context is enough for an answer' = "user_qa",
+    GENERAL_CONVERSATION : 'General purpose chat, not specific to documents' = "general_conversation"
 }
 
 node Router {
@@ -118,12 +119,11 @@ walker infer {
     has chat_history: list[dict];
 
     can init_router with `root entry {
-        visit [-->](`?Router) else {
-            router_node = here ++> Router();
-            router_node ++> RagChat();
-            router_node ++> QAChat();
-            visit router_node;
-        }
+        router_node = here ++> Router();
+        router_node ++> RagChat();
+        router_node ++> QAChat();
+        router_node ++> GeneralChat();
+        visit router_node;
     }
 
     can route with Router entry {
@@ -159,4 +159,21 @@ node QAChat :Chat: {
         here.response = respond_with_llm(here.message, here.chat_history, agent_role="You are a conversation agent designed to help users with their queries");
     }
 }
+
+node GeneralChat :Chat: {
+    has chat_type: ChatType = ChatType.GENERAL_CONVERSATION;
+
+    can respond with infer entry {
+        can 'Respond to message using chat_history as context and agent_role as the goal of the agent'
+        respond_with_llm(
+            message: 'current message': str,
+            chat_history: 'chat history': list[dict],
+            agent_role: 'role of the agent responding': str
+        ) -> 'response': str by llm();
+
+        # General chat response (no specific document-based context)
+        here.response = respond_with_llm(here.message, here.chat_history, agent_role="You are a conversation agent for general purposes.");
+    }
+}
+
 
